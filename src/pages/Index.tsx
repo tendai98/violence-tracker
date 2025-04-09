@@ -1,12 +1,31 @@
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapIcon, BarChart2Icon, LineChartIcon, PieChartIcon } from 'lucide-react';
+import { MapIcon } from 'lucide-react';
 import SvgAfricaMap from '@/components/SvgAfricaMap';
 import { mockConflictEvents } from '@/data/mockConflictData';
+import CountryDialog from '@/components/CountryDialog';
 
 const Index = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedEvents, setSelectedEvents] = useState(mockConflictEvents.slice(0, 10));
+
+  const handleCountryClick = (countryCode: string) => {
+    // Filter events for this country
+    const countryEvents = mockConflictEvents.filter(
+      event => event.country.substring(0, 2).toUpperCase() === countryCode
+    );
+    
+    if (countryEvents.length > 0) {
+      setSelectedEvents(countryEvents);
+      setSelectedCountry(countryEvents[0].country);
+      setDialogOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-sm">
@@ -39,8 +58,8 @@ const Index = () => {
                 ViolenceTracker provides comprehensive, real-time monitoring of political violence 
                 and protest events across the African continent.
               </p>
-              <div className="flex space-x-4">
-                <Button size="lg" asChild>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
                   <Link to="/dashboard">Explore Dashboard</Link>
                 </Button>
                 <Button variant="outline" size="lg">
@@ -51,50 +70,8 @@ const Index = () => {
               </div>
             </div>
             <div className="h-[400px] border border-border rounded-lg overflow-hidden">
-              <SvgAfricaMap events={mockConflictEvents.slice(0, 50)} />
+              <SvgAfricaMap events={mockConflictEvents.slice(0, 50)} onCountryClick={handleCountryClick} />
             </div>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Key Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader>
-                <MapIcon className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>Interactive Maps</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Visualize conflict data across the African continent with interactive maps</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <BarChart2Icon className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>Comprehensive Data</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Access data on political violence, protests, and other significant events</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <LineChartIcon className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>Trend Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Track historical trends and patterns in conflict events over time</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <PieChartIcon className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>Custom Reports</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Generate customized reports with filtering by country, event type, and date</p>
-              </CardContent>
-            </Card>
           </div>
         </section>
 
@@ -138,6 +115,14 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Dialog for country details */}
+      <CountryDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        countryName={selectedCountry}
+        events={selectedEvents}
+      />
     </div>
   );
 };

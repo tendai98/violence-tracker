@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { ConflictEvent, getEventsByCountry } from '@/data/mockConflictData';
 import { useToast } from '@/hooks/use-toast';
+import CountryDialog from './CountryDialog';
 
 interface SvgAfricaMapProps {
   events: ConflictEvent[];
@@ -12,6 +13,7 @@ interface CountryData {
   code: string;
   name: string;
   count: number;
+  events: ConflictEvent[];
 }
 
 const SvgAfricaMap = ({ events, onCountryClick }: SvgAfricaMapProps) => {
@@ -19,6 +21,9 @@ const SvgAfricaMap = ({ events, onCountryClick }: SvgAfricaMapProps) => {
   const [svgContent, setSvgContent] = useState<string>('');
   const [countryData, setCountryData] = useState<Record<string, CountryData>>({});
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCountryEvents, setSelectedCountryEvents] = useState<ConflictEvent[]>([]);
+  const [selectedCountryName, setSelectedCountryName] = useState<string>('');
 
   // Load SVG file
   useEffect(() => {
@@ -38,13 +43,25 @@ const SvgAfricaMap = ({ events, onCountryClick }: SvgAfricaMapProps) => {
     
     // Create mapping of country codes to event counts
     const data: Record<string, CountryData> = {};
+    
+    // Group events by country
+    const eventsByCountryMap: Record<string, ConflictEvent[]> = {};
+    events.forEach(event => {
+      const countryKey = event.country;
+      if (!eventsByCountryMap[countryKey]) {
+        eventsByCountryMap[countryKey] = [];
+      }
+      eventsByCountryMap[countryKey].push(event);
+    });
+    
     eventsByCountry.forEach(({ country, count }) => {
       // Extract the country code from the SVG path data-id attribute
       const code = country.substring(0, 2).toUpperCase();
       data[code] = {
         code,
         name: country,
-        count
+        count,
+        events: eventsByCountryMap[country] || []
       };
     });
     
@@ -55,7 +72,7 @@ const SvgAfricaMap = ({ events, onCountryClick }: SvgAfricaMapProps) => {
   const getCountryColor = (countryCode: string) => {
     const country = countryData[countryCode];
     
-    if (!country) return '#f2f2f2'; // Default gray for countries with no data
+    if (!country) return '#222222'; // Dark gray for countries with no data
     
     // Color scale based on count
     const count = country.count;
@@ -71,10 +88,16 @@ const SvgAfricaMap = ({ events, onCountryClick }: SvgAfricaMapProps) => {
     
     const country = countryData[countryCode];
     if (country) {
+      // Show tooltip notification
       toast({
         title: country.name,
         description: `${country.count} conflict events recorded`,
       });
+      
+      // Set data for dialog
+      setSelectedCountryEvents(country.events);
+      setSelectedCountryName(country.name);
+      setDialogOpen(true);
     } else {
       toast({
         title: "No Data",
@@ -103,12 +126,12 @@ const SvgAfricaMap = ({ events, onCountryClick }: SvgAfricaMapProps) => {
                 // Set color based on event count
                 const color = getCountryColor(countryCode);
                 const selectedStyle = selectedCountry === countryCode ? 
-                  'stroke-width: 2px; stroke: #3b82f6;' : 
+                  'stroke-width: 2px; stroke: #f97316;' : 
                   'stroke-width: 0.75px; stroke: #6b7280;';
                 
-                return `<path ${attributes} style="${style}; fill: ${color}; ${selectedStyle}" 
+                return `<path ${attributes} style="${style}; fill: ${color}; ${selectedStyle}; cursor: pointer;" 
                   data-country="${countryCode}" 
-                  class="cursor-pointer hover:opacity-80 transition-all duration-200"
+                  class="hover:opacity-80 transition-all duration-200"
                   onclick="document.dispatchEvent(new CustomEvent('country-click', {detail: '${countryCode}'}));"
                 `;
               }
@@ -149,10 +172,18 @@ const SvgAfricaMap = ({ events, onCountryClick }: SvgAfricaMapProps) => {
           <span>10+</span>
           <span className="w-3 h-3 bg-[#22c55e] rounded-sm"></span>
           <span>1-10</span>
-          <span className="w-3 h-3 bg-[#f2f2f2] rounded-sm"></span>
+          <span className="w-3 h-3 bg-[#222222] rounded-sm"></span>
           <span>No data</span>
         </div>
       </div>
+      
+      {/* Country Dialog */}
+      <CountryDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        countryName={selectedCountryName}
+        events={selectedCountryEvents}
+      />
     </div>
   );
 };

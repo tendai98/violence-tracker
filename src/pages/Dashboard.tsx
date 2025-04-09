@@ -15,7 +15,8 @@ import {
   getTotalInjuries, 
   getEventsByCountry, 
   getEventsByType, 
-  getEventsByMonth 
+  getEventsByMonth,
+  mockConflictEvents
 } from '@/data/mockConflictData';
 import { AlertCircleIcon, BarChartIcon, FlameIcon, MapIcon, UserIcon } from 'lucide-react';
 
@@ -80,30 +81,30 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2">
             <CardContent className="p-4">
-              <Tabs defaultValue="interactive-map">
+              <Tabs defaultValue="svg-map">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold">Geographic Visualization</h2>
                   <TabsList>
-                    <TabsTrigger value="interactive-map">Interactive Map</TabsTrigger>
                     <TabsTrigger value="svg-map">SVG Map</TabsTrigger>
+                    <TabsTrigger value="interactive-map">Interactive Map</TabsTrigger>
                     <TabsTrigger value="countries">Countries</TabsTrigger>
                   </TabsList>
                 </div>
-                <TabsContent value="interactive-map" className="m-0">
-                  <div className="h-[500px]">
-                    <ConflictMap events={events} />
-                  </div>
-                </TabsContent>
                 <TabsContent value="svg-map" className="m-0">
                   <div className="h-[500px]">
                     <SvgAfricaMap events={events} />
+                  </div>
+                </TabsContent>
+                <TabsContent value="interactive-map" className="m-0">
+                  <div className="h-[500px]">
+                    <ConflictMap events={events} />
                   </div>
                 </TabsContent>
                 <TabsContent value="countries" className="m-0">
                   <div className="h-[500px]">
                     <BarChart 
                       data={countriesData}
-                      color="#3B82F6"
+                      color="#F97316"
                       height={480}
                       title="Top Countries by Incident Count"
                       xAxisLabel="Country"
@@ -134,7 +135,7 @@ const Dashboard = () => {
             <div className="h-[300px]">
               <LineChart 
                 data={monthlyData}
-                color="#8B5CF6"
+                color="#F97316"
                 height={280}
                 xAxisLabel="Month"
                 yAxisLabel="Incidents"
@@ -153,7 +154,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      {renderDashboard}
+      {renderDashboard(mockConflictEvents)}
     </DashboardLayout>
   );
 };
