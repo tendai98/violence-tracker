@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import ConflictMap from '@/components/ConflictMap';
+import SvgAfricaMap from '@/components/SvgAfricaMap';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MetricCard from '@/components/MetricCard';
@@ -47,7 +48,7 @@ const Index = () => {
     
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Political Violence Monitoring in Africa</h1>
+        <h1 className="text-2xl font-bold tracking-tight">ViolenceTracker: Political Violence Monitoring in Africa</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
@@ -79,17 +80,23 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2">
             <CardContent className="p-4">
-              <Tabs defaultValue="map">
+              <Tabs defaultValue="interactive-map">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold">Geographic Visualization</h2>
                   <TabsList>
-                    <TabsTrigger value="map">Map</TabsTrigger>
+                    <TabsTrigger value="interactive-map">Interactive Map</TabsTrigger>
+                    <TabsTrigger value="svg-map">SVG Map</TabsTrigger>
                     <TabsTrigger value="countries">Countries</TabsTrigger>
                   </TabsList>
                 </div>
-                <TabsContent value="map" className="m-0">
+                <TabsContent value="interactive-map" className="m-0">
                   <div className="h-[500px]">
                     <ConflictMap events={events} />
+                  </div>
+                </TabsContent>
+                <TabsContent value="svg-map" className="m-0">
+                  <div className="h-[500px]">
+                    <SvgAfricaMap events={events} />
                   </div>
                 </TabsContent>
                 <TabsContent value="countries" className="m-0">

@@ -37,8 +37,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <SidebarHeader className="px-6 py-5 flex items-center space-x-3">
             <MapIcon className="h-6 w-6 text-primary" />
             <div>
-              <h1 className="text-lg font-bold tracking-tight">Africa Conflict</h1>
-              <p className="text-xs text-muted-foreground">Insight Dashboard</p>
+              <h1 className="text-lg font-bold tracking-tight">ViolenceTracker</h1>
+              <p className="text-xs text-muted-foreground">Africa Conflict Monitor</p>
             </div>
           </SidebarHeader>
           <SidebarContent className="px-4 py-2">
