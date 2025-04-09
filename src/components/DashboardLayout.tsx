@@ -7,7 +7,7 @@ import FilterControls from './FilterControls';
 import { ConflictEvent, getFilteredEvents, mockConflictEvents } from '@/data/mockConflictData';
 
 interface DashboardLayoutProps {
-  children: React.ReactNode;
+  children: React.ReactNode | ((events: ConflictEvent[]) => React.ReactNode);
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
@@ -79,7 +79,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </header>
 
           <main className="flex-1 overflow-auto p-6">
-            {typeof children === 'function' ? children(filteredEvents) : children}
+            {typeof children === 'function' 
+              ? children(filteredEvents) 
+              : children}
           </main>
         </div>
       </div>
